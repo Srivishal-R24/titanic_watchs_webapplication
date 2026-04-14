@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Checkout</title>
+
+<style>
+body{
+    font-family: Arial;
+    background:#f5f5f5;
+    padding:20px;
+}
+.container{
+    max-width:700px;
+    margin:auto;
+    background:#fff;
+    padding:20px;
+    border-radius:10px;
+}
+input, textarea{
+    width:100%;
+    padding:10px;
+    margin:8px 0;
+}
+button{
+    padding:12px;
+    background:black;
+    color:#fff;
+    border:none;
+    cursor:pointer;
+    width:100%;
+}
+.section{
+    margin-bottom:20px;
+}
+.product-card{
+    text-align:center;
+    border:1px solid #ddd;
+    padding:15px;
+    border-radius:10px;
+    background:#fafafa;
+}
+.product-card img{
+    width:150px;
+    margin-bottom:10px;
+}
+.price{
+    font-size:18px;
+    font-weight:bold;
+    color:#2ecc71;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h2>Checkout</h2>
+
+<!-- ================= CUSTOMER DETAILS ================= -->
+<div class="section">
+    <h3>Customer Details</h3>
+
+    <input type="text" id="name" placeholder="Full Name">
+    <input type="email" id="email" placeholder="Email">
+    <input type="tel" id="phone" placeholder="Phone Number">
+    <textarea id="address" placeholder="Address"></textarea>
+</div>
+
+<hr>
+
+<!-- ================= PRODUCT DETAILS ================= -->
+<div class="section">
+    <h3>Selected Watch</h3>
+    <div id="product"></div>
+</div>
+
+<hr>
+
+<button onclick="showQR()">Pay Now</button>
+
+<!-- ================= QR PAYMENT ================= -->
+<div id="qrSection" style="display:none; text-align:center; margin-top:20px;">
+    <h3>Scan & Pay (UPI)</h3>
+
+    <img id="qrImage" src="" alt="QR Code" style="width:200px;">
+
+    <p>UPI ID: rsrivishal24@okicici</p>
+
+    <button onclick="confirmPayment()">I Paid</button>
+</div>
+
+</div>
+
+<script>
+
+/* ================= SHOW PRODUCT (FINAL FIXED) ================= */
+const product = JSON.parse(localStorage.getItem("cartProduct"))
+
+if(product){
+    document.getElementById("product").innerHTML = `
+        <div class="product-card">
+            <img src="${product.img}">
+            <h3>${product.name}</h3>
+            <p class="price">${product.price}</p>
+        </div>
+    `
+}else{
+    document.getElementById("product").innerHTML = "<p>No product selected ❌</p>"
+}
+
+/* ================= SHOW QR ================= */
+function showQR(){
+
+    const name = document.getElementById("name").value
+    const email = document.getElementById("email").value
+    const phone = document.getElementById("phone").value
+    const address = document.getElementById("address").value
+
+    if(!name || !email || !phone || !address){
+        alert("Please fill all details ❗")
+        return
+    }
+
+    if(!product){
+        alert("No product selected ❗")
+        return
+    }
+
+    let amount = product.price.replace("$","")
+
+    let upiLink = `upi://pay?pa=rsrivishal24@okicici&pn=WatchStore&am=${amount}&cu=INR`
+
+    let qrURL = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(upiLink)}`
+
+    document.getElementById("qrImage").src = qrURL
+    document.getElementById("qrSection").style.display = "block"
+}
+
+/* ================= CONFIRM PAYMENT ================= */
+function confirmPayment(){
+    alert("Payment received ✅")
+    localStorage.removeItem("cartProduct")
+    window.location.href = "index.html"
+}
+
+</script>
+
+</body>
+</html>
